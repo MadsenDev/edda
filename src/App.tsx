@@ -33,7 +33,7 @@ export function App() {
     mockData, setMockData,
     rightTab, setRightTab,
     exportOpen, setExportOpen,
-    aiBusy, lineCount,
+    aiBusy, aiReply, aiError, lineCount,
     fontSize,
     undo, updateNode, action,
     onDropNew, onMove, appendNew,
@@ -186,7 +186,7 @@ export function App() {
             </div>
           </div>
 
-          <AIBar onGenerate={onAI} busy={aiBusy} />
+          <AIBar onGenerate={onAI} busy={aiBusy} reply={aiReply} error={aiError} />
         </main>
 
         <aside className="right-panel">
