@@ -63,7 +63,7 @@ button { font-family: var(--mono); cursor: pointer; color: inherit; }
 
 /* ---------- center / canvas ---------- */
 .canvas-scroll {
-  flex: 1; overflow: auto; padding: 26px 28px 18px; display: flex; flex-direction: column; align-items: center; gap: 22px;
+  flex: 1; min-height: 0; overflow: auto; padding: 26px 28px 18px; display: flex; flex-direction: column; align-items: center; gap: 22px;
   background:
     radial-gradient(circle at 1px 1px, #14181f 1px, transparent 0) 0 0/22px 22px,
     var(--app-bg);
