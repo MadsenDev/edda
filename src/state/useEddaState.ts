@@ -64,6 +64,7 @@ export function useEddaState() {
   const [sampleLabel, setSampleLabel] = useState<{ cli: string; tui: string }>(
     saved?.sampleLabel ?? { cli: "Deployment summary", tui: "Monitoring dashboard" }
   );
+  const [projectName, setProjectName] = useState<string>(saved?.projectName ?? "Deployment summary");
   const [selectedId,  setSelectedId ] = useState<string | null>(null);
   const [cols,        setCols       ] = useState<number>(saved?.cols ?? 80);
   const [theme,       setTheme      ] = useState<Theme>(saved?.theme ?? { border: "single" });
@@ -81,11 +82,11 @@ export function useEddaState() {
   useEffect(() => {
     const t = setTimeout(() => {
       try {
-        localStorage.setItem("edda_state_v2", JSON.stringify({ mode, cliDoc, tuiDoc, sampleLabel, cols, theme, palette }));
+        localStorage.setItem("edda_state_v2", JSON.stringify({ mode, cliDoc, tuiDoc, sampleLabel, cols, theme, palette, projectName }));
       } catch (_) {}
     }, 200);
     return () => clearTimeout(t);
-  }, [mode, cliDoc, tuiDoc, sampleLabel, cols, theme, palette]);
+  }, [mode, cliDoc, tuiDoc, sampleLabel, cols, theme, palette, projectName]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -234,6 +235,16 @@ export function useEddaState() {
     onDropNew(type, doc.type === "column" ? ((doc as Node & { children: Node[] }).children || []).length : 0);
   }
 
+  function newCanvas() {
+    const empty = (): Node => ({ id: uid("column"), type: "column", children: [] });
+    setCliDoc(empty());
+    setTuiDoc(empty());
+    setSampleLabel({ cli: "", tui: "" });
+    setProjectName("Untitled");
+    setSelectedId(null);
+    histories.current = { cli: [], tui: [] };
+  }
+
   function loadSample(m: Mode, key: string) {
     const def = SAMPLES[m][key];
     if (!def) return;
@@ -241,6 +252,7 @@ export function useEddaState() {
     else setTuiDoc(def.build());
     if (def.mockData) setMockData(def.mockData);
     setSampleLabel((s) => ({ ...s, [m]: def.label }));
+    setProjectName(def.label);
     setMode(m);
     setSelectedId(null);
     histories.current[m] = [];
@@ -256,6 +268,7 @@ export function useEddaState() {
       if (preset.mockData) setMockData(preset.mockData);
       setMode(preset.mode);
       setSampleLabel((s) => ({ ...s, [preset.mode]: "AI · " + prompt.slice(0, 28) }));
+      setProjectName("AI · " + prompt.slice(0, 28));
       setSelectedId(null);
       histories.current[preset.mode] = [];
       setAiBusy(false);
@@ -270,6 +283,7 @@ export function useEddaState() {
   return {
     mode, setMode,
     doc, cliDoc, tuiDoc,
+    projectName, setProjectName,
     sampleLabel, setSampleLabel,
     selectedId, setSelectedId,
     selectedNode,
@@ -284,7 +298,7 @@ export function useEddaState() {
     lineCount,
     mutate, undo, updateNode, action,
     onDropNew, onMove, appendNew,
-    loadSample, onAI,
+    loadSample, onAI, newCanvas,
     createDefault,
   };
 }

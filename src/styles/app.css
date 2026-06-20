@@ -63,7 +63,7 @@ button { font-family: var(--mono); cursor: pointer; color: inherit; }
 
 /* ---------- center / canvas ---------- */
 .canvas-scroll {
-  flex: 1; overflow: auto; padding: 26px 28px 18px; display: flex; flex-direction: column; align-items: center; gap: 22px;
+  flex: 1; min-height: 0; overflow: auto; padding: 26px 28px 18px; display: flex; flex-direction: column; align-items: center; gap: 22px;
   background:
     radial-gradient(circle at 1px 1px, #14181f 1px, transparent 0) 0 0/22px 22px,
     var(--app-bg);
@@ -196,3 +196,58 @@ button { font-family: var(--mono); cursor: pointer; color: inherit; }
   .right-panel { width: 290px; flex-basis: 290px; }
   .left-panel  { width: 200px; flex-basis: 200px; }
 }
+
+/* ---------- project name button ---------- */
+.project-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--txt-2); font-size: 12.5px; padding: 5px 9px; border-radius: 6px;
+  transition: .14s; white-space: nowrap; max-width: 200px; cursor: pointer;
+}
+.project-btn:hover { border-color: var(--line); color: var(--txt); background: #0e1115; }
+.project-btn-name { overflow: hidden; text-overflow: ellipsis; }
+.project-btn-caret { color: var(--txt-3); font-size: 9px; flex-shrink: 0; }
+.icon-btn { padding: 7px 10px; }
+
+/* ---------- modal ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px); display: grid; place-items: center;
+  z-index: 200; animation: fadeIn .15s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--chrome); border: 1px solid var(--line-2); border-radius: 12px;
+  width: 460px; max-width: calc(100vw - 40px);
+  box-shadow: 0 32px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.03);
+  animation: scaleIn .15s ease;
+}
+@keyframes scaleIn { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-sm { width: 380px; }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 16px; border-bottom: 1px solid var(--line);
+}
+.modal-title { font-size: 14px; font-weight: 600; color: var(--txt); }
+.modal-close {
+  background: transparent; border: 0; color: var(--txt-3);
+  font-size: 15px; padding: 4px; cursor: pointer; line-height: 1; border-radius: 4px;
+}
+.modal-close:hover { color: var(--txt); background: var(--line); }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.modal-msg { color: var(--txt-2); font-size: 13px; margin: 0; line-height: 1.6; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 6px; }
+.field-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--txt-3); }
+.field-row { display: flex; gap: 8px; }
+.field-input {
+  flex: 1; background: #080a0d; border: 1px solid var(--line-2);
+  color: var(--txt); padding: 8px 10px; border-radius: 6px;
+  font-family: var(--mono); font-size: 13px; outline: none;
+}
+.field-input:focus { border-color: color-mix(in srgb, var(--accent) 50%, var(--line-2)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent); }
+.btn.danger {
+  background: color-mix(in srgb, #f85149 14%, #10141a);
+  border-color: color-mix(in srgb, #f85149 38%, var(--line));
+  color: #f85149; font-weight: 500;
+}
+.btn.danger:hover { background: color-mix(in srgb, #f85149 22%, #10141a); }

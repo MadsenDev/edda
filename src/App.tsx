@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Canvas } from "./components/Canvas";
 import { MiniPreview } from "./components/MiniPreview";
 import { Palette } from "./components/Palette";
@@ -7,6 +8,7 @@ import { ThemeDesigner } from "./components/ThemeDesigner";
 import { MockDataPanel } from "./components/MockDataPanel";
 import { AIBar } from "./components/AIBar";
 import { ExportDrawer } from "./components/ExportDrawer";
+import { SettingsModal } from "./components/SettingsModal";
 import { useEddaState, WIDTHS } from "./state/useEddaState";
 import { SAMPLES } from "./samples";
 
@@ -22,6 +24,7 @@ export function App() {
   const {
     mode, setMode,
     doc, sampleLabel,
+    projectName, setProjectName,
     selectedId, setSelectedId,
     selectedNode,
     cols, setCols,
@@ -34,8 +37,11 @@ export function App() {
     fontSize,
     undo, updateNode, action,
     onDropNew, onMove, appendNew,
-    loadSample, onAI,
+    loadSample, onAI, newCanvas,
   } = state;
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [confirmNew,   setConfirmNew  ] = useState(false);
 
   const cssVars = {
     "--bg":     palette.bg,
@@ -59,6 +65,11 @@ export function App() {
           <span className="brand-name">edda</span>
           <span className="brand-sub">terminal designer</span>
         </div>
+
+        <button className="project-btn" onClick={() => setSettingsOpen(true)} title="Project settings">
+          <span className="project-btn-name">{projectName}</span>
+          <span className="project-btn-caret">▾</span>
+        </button>
 
         <div className="mode-switch">
           <button
@@ -89,8 +100,10 @@ export function App() {
         </div>
 
         <div className="top-actions">
+          <button className="btn ghost"   onClick={() => setConfirmNew(true)}       title="New canvas">+ New</button>
           <button className="btn ghost"   onClick={undo}                            title="Undo">↺ Undo</button>
           <button className="btn primary" onClick={() => setExportOpen((v) => !v)} title="Export">⇪ Export</button>
+          <button className="btn ghost icon-btn" onClick={() => setSettingsOpen(true)} title="Settings">⚙</button>
         </div>
       </header>
 
@@ -110,7 +123,7 @@ export function App() {
               <div className="tw-bar">
                 <div className="tw-dots"><i /><i /><i /></div>
                 <div className="tw-title">
-                  edda — {sampleLabel[mode] || "untitled"}{mode === "cli" ? "  ·  cli output" : "  ·  fullscreen tui"}
+                  {projectName}{mode === "cli" ? "  ·  cli output" : "  ·  fullscreen tui"}
                 </div>
                 <div className="tw-size">{cols} × {lineCount}</div>
               </div>
@@ -222,6 +235,32 @@ export function App() {
           palette={palette}
           mockData={mockData}
           onClose={() => setExportOpen(false)}
+        />
+      )}
+
+      {confirmNew && (
+        <div className="modal-overlay" onClick={() => setConfirmNew(false)}>
+          <div className="modal modal-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <span className="modal-title">New canvas</span>
+              <button className="modal-close" onClick={() => setConfirmNew(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-msg">This will clear all content in both CLI and TUI modes. Your current work will be lost.</p>
+              <div className="modal-foot">
+                <button className="btn ghost" onClick={() => setConfirmNew(false)}>Cancel</button>
+                <button className="btn danger" onClick={() => { newCanvas(); setConfirmNew(false); }}>Clear &amp; start new</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {settingsOpen && (
+        <SettingsModal
+          projectName={projectName}
+          onRename={setProjectName}
+          onClose={() => setSettingsOpen(false)}
         />
       )}
     </div>
