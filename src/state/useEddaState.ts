@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { findNode, removeNode, walk, uid } from "../engine/model";
 import { render } from "../engine/render";
 import { cliDeploy, tuiDashboard, SAMPLES, AI_PRESETS } from "../samples";
+import { generateLayout } from "../ai/client";
 import type { Node } from "../engine/model";
 
 export type Palette = {
@@ -73,6 +74,8 @@ export function useEddaState() {
   const [rightTab,    setRightTab   ] = useState<string>("inspect");
   const [exportOpen,  setExportOpen ] = useState(false);
   const [aiBusy,      setAiBusy     ] = useState(false);
+  const [aiReply,     setAiReply    ] = useState("");
+  const [aiError,     setAiError    ] = useState("");
   const [fontSize,    setFontSize   ] = useState(16);
   const histories = useRef<{ cli: Node[]; tui: Node[] }>({ cli: [], tui: [] });
 
@@ -258,11 +261,27 @@ export function useEddaState() {
     histories.current[m] = [];
   }
 
-  function onAI(prompt: string) {
+  async function onAI(prompt: string) {
     setAiBusy(true);
-    const lower  = prompt.toLowerCase();
-    const preset = AI_PRESETS.find((p) => p.match.some((m) => lower.includes(m))) || AI_PRESETS[0];
-    setTimeout(() => {
+    setAiReply("");
+    setAiError("");
+    try {
+      const result = await generateLayout(prompt);
+      if (result.mode === "cli") setCliDoc(result.layout);
+      else setTuiDoc(result.layout);
+      if (result.mockData) setMockData(result.mockData);
+      setMode(result.mode);
+      setSampleLabel((s) => ({ ...s, [result.mode]: "AI · " + prompt.slice(0, 28) }));
+      setProjectName("AI · " + prompt.slice(0, 28));
+      setSelectedId(null);
+      histories.current[result.mode] = [];
+      setAiReply(result.reply);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setAiError(msg);
+      // Fall back to keyword-matched preset so the canvas isn't left empty
+      const lower = prompt.toLowerCase();
+      const preset = AI_PRESETS.find((p) => p.match.some((m) => lower.includes(m))) || AI_PRESETS[0];
       if (preset.mode === "cli") setCliDoc(preset.build());
       else setTuiDoc(preset.build());
       if (preset.mockData) setMockData(preset.mockData);
@@ -271,8 +290,9 @@ export function useEddaState() {
       setProjectName("AI · " + prompt.slice(0, 28));
       setSelectedId(null);
       histories.current[preset.mode] = [];
+    } finally {
       setAiBusy(false);
-    }, 850);
+    }
   }
 
   const lineCount = useMemo(
@@ -293,7 +313,7 @@ export function useEddaState() {
     mockData, setMockData,
     rightTab, setRightTab,
     exportOpen, setExportOpen,
-    aiBusy,
+    aiBusy, aiReply, aiError,
     fontSize, setFontSize,
     lineCount,
     mutate, undo, updateNode, action,
