@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>edda — terminal designer</title>
+  <style>
+    /* inline critical tokens so boot splash renders before any JS */
+    :root {
+      --app-bg: #070809;
+      --accent: #5fd7a0;
+      --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --txt-3: #565d68;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--app-bg); color: #e6e8ec; font-family: var(--mono); overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<div id="boot" aria-label="edda loading">
+  <div class="boot-row">
+    <svg class="boot-mark" id="bootMark" viewBox="0 0 96 48" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+      <rect x="24" y="0" width="24" height="24"></rect>
+      <rect x="0" y="24" width="24" height="24"></rect>
+      <rect x="48" y="0" width="24" height="24"></rect>
+      <rect x="72" y="24" width="24" height="24"></rect>
+    </svg>
+    <span class="boot-word">
+      <span class="l">e</span><span class="l">d</span><span class="l">d</span><span class="l">a</span>
+      <span class="boot-cur"></span>
+    </span>
+  </div>
+  <div class="boot-load">
+    <div class="boot-load-row">
+      <span>initializing canvas</span>
+      <span class="boot-pct" id="bootPct">0%</span>
+    </div>
+    <div class="boot-track"><div class="boot-bar"></div></div>
+  </div>
+  <div class="boot-skip">click to skip</div>
+</div>
+
+<div id="root"></div>
+
+<script>
+  (function () {
+    var boot  = document.getElementById('boot');
+    var mark  = document.getElementById('bootMark');
+    var pctEl = document.getElementById('bootPct');
+    if (!boot) return;
+
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    setTimeout(function () { mark && mark.classList.add('breathe'); }, 750);
+
+    if (reduce) {
+      pctEl.textContent = '100%';
+    } else {
+      var start = null, dur = 1550, delay = 1150;
+      function tick(t) {
+        if (!document.body.contains(boot)) return;
+        if (start === null) start = t;
+        var e = t - start - delay;
+        if (e < 0) { requestAnimationFrame(tick); return; }
+        var p = Math.min(1, e / dur);
+        var v = p < .7 ? (p / .7) * 88 : 88 + ((p - .7) / .3) * 12;
+        pctEl.textContent = Math.round(Math.min(100, v)) + '%';
+        if (p < 1) requestAnimationFrame(tick); else pctEl.textContent = '100%';
+      }
+      requestAnimationFrame(tick);
+    }
+
+    var dismissed = false;
+    function dismiss() {
+      if (dismissed) return;
+      dismissed = true;
+      boot.classList.add('gone');
+      setTimeout(function () { if (boot && boot.parentNode) boot.parentNode.removeChild(boot); }, 600);
+    }
+    boot.addEventListener('click', dismiss);
+    setTimeout(dismiss, reduce ? 700 : 2550);
+  })();
+</script>
+
+<script type="module" src="./main.tsx"></script>
+</body>
+</html>

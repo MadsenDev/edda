@@ -1,0 +1,15 @@
+:root {
+  --app-bg: #070809;
+  --chrome: #0d0f13;
+  --chrome-2: #0a0c10;
+  --panel: #0e1116;
+  --line: #1b1f27;
+  --line-2: #23282f;
+  --txt: #c7ccd6;
+  --txt-2: #7b828f;
+  --txt-3: #565d68;
+  --accent: #5fd7a0;
+  --bg: #0d1117;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 7px;
+}

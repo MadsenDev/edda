@@ -1,0 +1,78 @@
+#boot {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 28px; cursor: pointer;
+  background:
+    radial-gradient(120vmax 80vmax at 50% -20%, rgba(95,215,160,.10), transparent 55%),
+    radial-gradient(90vmax 70vmax at 80% 120%, rgba(57,197,207,.06), transparent 55%),
+    var(--app-bg);
+  transition: opacity .55s ease, transform .55s ease;
+}
+#boot::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,.012) 3px 4px);
+}
+#boot.gone { opacity: 0; transform: scale(1.015); pointer-events: none; }
+
+.boot-row { display: flex; align-items: center; gap: clamp(12px,3.5vw,22px); z-index: 1; }
+.boot-mark {
+  width: clamp(48px,14vw,76px); height: auto; display: block; overflow: visible;
+  filter: drop-shadow(0 0 16px rgba(95,215,160,.30));
+}
+.boot-mark rect {
+  fill: var(--accent); opacity: 1; transform-box: fill-box; transform-origin: center;
+  animation: bootPop .5s cubic-bezier(.2,1.25,.4,1) backwards;
+}
+.boot-mark rect:nth-child(1) { animation-delay: .10s; }
+.boot-mark rect:nth-child(2) { animation-delay: 0s; }
+.boot-mark rect:nth-child(3) { animation-delay: .10s; }
+.boot-mark rect:nth-child(4) { animation-delay: .20s; }
+@keyframes bootPop { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: scale(1); } }
+.boot-mark.breathe { animation: bootBreathe 3.4s ease-in-out 1s infinite; }
+@keyframes bootBreathe { 50% { filter: drop-shadow(0 0 26px rgba(95,215,160,.5)); } }
+
+.boot-word {
+  font-family: var(--mono); font-weight: 700; letter-spacing: -.04em; color: #eef1f5;
+  font-size: clamp(38px,11vw,68px); line-height: .85; display: flex; align-items: center;
+}
+.boot-word .l { display: inline-block; animation: bootRise .42s cubic-bezier(.2,.9,.3,1) backwards; }
+.boot-word .l:nth-child(1) { animation-delay: .50s; }
+.boot-word .l:nth-child(2) { animation-delay: .59s; }
+.boot-word .l:nth-child(3) { animation-delay: .68s; }
+.boot-word .l:nth-child(4) { animation-delay: .77s; }
+@keyframes bootRise { from { opacity: 0; transform: translateY(.2em); } to { opacity: 1; transform: translateY(0); } }
+
+.boot-cur {
+  display: inline-block; width: clamp(7px,2vw,12px); height: clamp(34px,9.5vw,58px);
+  background: var(--accent); margin-left: 6px; border-radius: 2px; align-self: center;
+  box-shadow: 0 0 16px rgba(95,215,160,.45); animation: bootBlink 1.05s steps(1) infinite;
+}
+@keyframes bootBlink { 50% { opacity: 0; } }
+
+.boot-load {
+  width: min(240px,62vw); display: flex; flex-direction: column; gap: 9px; z-index: 1;
+  animation: bootFade .5s 1.05s backwards;
+}
+.boot-load-row { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--txt-3); letter-spacing: .05em; }
+.boot-pct { color: var(--accent); }
+.boot-track { height: 5px; border-radius: 99px; background: #161d25; overflow: hidden; position: relative; }
+.boot-bar {
+  position: absolute; inset: 0; border-radius: 99px; transform-origin: left;
+  background: linear-gradient(90deg, var(--accent), #39c5cf);
+  box-shadow: 0 0 14px rgba(95,215,160,.4);
+  animation: bootLoad 1.55s 1.15s cubic-bezier(.5,.05,.1,1) backwards;
+}
+@keyframes bootLoad { from { transform: scaleX(0); } 70% { transform: scaleX(.88); } to { transform: scaleX(1); } }
+@keyframes bootFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.boot-skip {
+  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 1;
+  font-family: var(--mono); font-size: 11px; color: var(--txt-3); letter-spacing: .16em;
+  text-transform: uppercase; animation: bootFade .6s 2s backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-mark rect, .boot-word .l, .boot-load, .boot-bar, .boot-skip { animation: none !important; }
+  .boot-mark.breathe { animation: none !important; }
+  .boot-bar { transform: scaleX(1); }
+}
